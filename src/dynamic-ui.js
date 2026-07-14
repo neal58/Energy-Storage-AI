@@ -1,0 +1,26 @@
+import {createNamingTask,generateRecommendations} from './dynamic-core.js';
+
+function esc(text=''){return String(text).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+function renderApp(){
+  const app=document.querySelector('#app');
+  if(!app)return;
+  app.innerHTML=`<div class="wrap"><header><div class="eyebrow">动态取名引擎 · 非固定名单</div><h1>好名有解</h1><p>父母姓氏、孩子姓氏方式、出生时间与个人偏好共同参与实时生成。</p></header><main><section class="form-card"><div class="grid"><label>父亲姓氏<input id="father-surname" value="陈" maxlength="2"></label><label>母亲姓氏<input id="mother-surname" value="林" maxlength="2"></label><label>孩子姓氏<select id="surname-mode"><option value="father">随父姓</option><option value="mother">随母姓</option><option value="double">父母双姓</option></select></label><label>母姓参与<select id="maternal-mode"><option value="none">不参与名字</option><option value="symbolic" selected>意象纪念</option><option value="direct">直接作为名字首字</option></select></label><label>性别倾向<select id="gender"><option value="neutral">中性均可</option><option value="boy">男孩</option><option value="girl">女孩</option></select></label><label>名字长度<select id="name-length"><option value="2">双字名</option><option value="1">单字名</option></select></label><label>出生日期<input id="birth-date" type="date" value="2026-07-14"></label><label>出生时间<input id="birth-time" type="time" value="19:20"></label><label>出生地时区<select id="timezone"><option value="+08:00">中国 UTC+8</option><option value="+09:00" selected>印尼东部 UTC+9</option><option value="+07:00">印尼西部 UTC+7</option></select></label><label class="check"><input id="traditional-reference" type="checkbox" checked>启用传统历法参考</label><label>风格<select id="style"><option>温润</option><option>清朗</option><option>稳重</option><option>书卷</option><option>现代</option><option>简洁</option><option>自然</option><option>古典</option></select></label><label>核心寓意<select id="meaning"><option>智慧</option><option>品格</option><option>志向</option><option>平安</option><option>光明</option><option>成长</option><option>从容</option><option>责任</option></select></label><label>指定字<input id="required-char" maxlength="1" placeholder="可选"></label><label>避开字<input id="avoid-chars" placeholder="如：梓轩"></label><label>家庭避讳词<input id="custom-taboos" placeholder="用逗号分隔"></label><label class="check"><input id="avoid-trend" type="checkbox" checked>降低高频网红字权重</label></div><button id="generate">生成专属名字</button><button id="refresh" class="secondary">换一批</button></section><section id="birth-summary" class="summary"></section><section id="recommendations" class="cards"></section></main></div>`;
+  let seed=0;
+  const collect=()=>({fatherSurname:document.querySelector('#father-surname').value.trim(),motherSurname:document.querySelector('#mother-surname').value.trim(),surnameMode:document.querySelector('#surname-mode').value,maternalMode:document.querySelector('#maternal-mode').value,gender:document.querySelector('#gender').value,nameLength:Number(document.querySelector('#name-length').value),birthDate:document.querySelector('#birth-date').value,birthTime:document.querySelector('#birth-time').value,timezone:document.querySelector('#timezone').value,traditionalReference:document.querySelector('#traditional-reference').checked,style:document.querySelector('#style').value,meaning:document.querySelector('#meaning').value,requiredChar:document.querySelector('#required-char').value,avoidChars:document.querySelector('#avoid-chars').value,customTaboos:document.querySelector('#custom-taboos').value,avoidTrend:document.querySelector('#avoid-trend').checked});
+  const run=()=>{
+    const task=createNamingTask(collect());
+    const results=generateRecommendations(task,{seed,limit:8});
+    const pillars=Object.values(task.birthProfile.pillars||{}).join(' · ');
+    document.querySelector('#birth-summary').innerHTML=`<b>${esc(task.surname)}姓 · 本次动态条件</b><span>季节：${esc(task.birthProfile.seasonTags.join('、'))}</span><span>时段：${esc(task.birthProfile.timeTags.join('、'))}</span><span>母姓纪念：${esc(task.maternalTags.join('、')||'未启用')}</span>${pillars?`<span>四柱参考：${esc(pillars)}</span>`:''}${task.birthProfile.warnings.map(x=>`<em>${esc(x)}</em>`).join('')}`;
+    document.querySelector('#recommendations').innerHTML=results.length?results.map(item=>`<article><div class="category">${esc(item.category)}</div><h2>${esc(item.fullName)}</h2><div class="pinyin">${esc(item.pinyin)}</div><p>${esc(item.meaning)}</p><dl><dt>姓氏连读</dt><dd>${esc(item.phonology.evidence.join('；')||'整体自然')}${item.phonology.warnings.length?`；提醒：${esc(item.phonology.warnings.join('、'))}`:''}</dd><dt>出生信息</dt><dd>${esc(item.birthContribution.join('、')||'未直接触发特定意象')}</dd><dt>母姓参与</dt><dd>${esc(item.maternalContribution.join('、')||'未直接影响该候选')}</dd><dt>出处</dt><dd>${esc(item.source)}</dd></dl></article>`).join(''):'<div class="empty">当前条件没有合格结果。若选择了“母姓直接入名”，说明该母姓目前没有自然组合，建议改用“意象纪念”；否则请减少指定或避讳条件。</div>';
+  };
+  document.querySelector('#surname-mode').addEventListener('change',event=>{if(event.target.value==='double')document.querySelector('#name-length').value='1';});
+  document.querySelector('#generate').onclick=()=>{seed=0;run();};
+  document.querySelector('#refresh').onclick=()=>{seed++;run();};
+  run();
+}
+
+if(typeof document!=='undefined'){
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',renderApp);else renderApp();
+}
