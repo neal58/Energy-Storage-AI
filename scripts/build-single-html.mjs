@@ -1,9 +1,6 @@
-import {readFile,writeFile} from 'node:fs/promises';
-const [template,css]=await Promise.all([
-  readFile(new URL('../src/template.html',import.meta.url),'utf8'),
-  readFile(new URL('../src/styles.css',import.meta.url),'utf8')
-]);
-const moduleUrl='https://cdn.jsdelivr.net/gh/neal58/Energy-Storage-AI@457097a282cfe0a2f16719347d190dc175023fc2/src/dynamic-ui.js';
-const html=template.replace('__INLINE_CSS__',css).replace('__APP_MODULE__',moduleUrl);
-if(html.includes('__INLINE_')||html.includes('__APP_MODULE__'))throw new Error('build placeholders remain');
-await writeFile(new URL('../index.html',import.meta.url),html);
+import {readFile} from 'node:fs/promises';
+const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
+const required=['id="father-surname"','id="mother-surname"','id="birth-date"','id="birth-time"','id="generate"','id="recommendations"','<style>','<script>'];
+for(const marker of required){if(!html.includes(marker))throw new Error(`missing standalone marker: ${marker}`);}
+if(/<script[^>]+src=/.test(html))throw new Error('standalone HTML must not load external scripts');
+if(/type=["']module["']/.test(html))throw new Error('standalone HTML must not use ES modules');
