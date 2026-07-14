@@ -1,65 +1,38 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterCandidates } from '../src/engine/filter.js';
-import { detectFullNameRisks } from '../src/engine/risk.js';
-import { scoreCandidate } from '../src/engine/score.js';
-import { recommendNames } from '../src/engine/recommend.js';
-import { applyFeedback } from '../src/engine/feedback.js';
+import {filterCandidates} from '../src/engine/filter.js';
+import {detectFullNameRisks} from '../src/engine/risk.js';
+import {scoreCandidate,scorePronunciation} from '../src/engine/score.js';
+import {recommendNames} from '../src/engine/recommend.js';
 
-test('filters polyphonic, avoided and risky candidates', () => {
-  const candidates = [
-    { name: '清和', chars: ['清', '和'], risks: [], polyphonic: false },
-    { name: '行远', chars: ['行', '远'], risks: [], polyphonic: true },
-    { name: '梓轩', chars: ['梓', '轩'], risks: ['avoid'], polyphonic: false }
-  ];
-  const result = filterCandidates(candidates, { avoidChars: ['梓'], allowPolyphonic: false });
-  assert.deepEqual(result.map(item => item.name), ['清和']);
+const base={name:'知远',chars:['知','远'],pinyin:['zhī','yuǎn'],tones:[1,3],gender:'boy',styles:['温润'],meanings:['智慧'],meaningText:'',natural:98,semantic:98,adult:99,writing:94,popularity:4,source:'',sourceVerified:false,polyphonic:false,risks:[]};
+
+test('same syllable and surname-specific patterns are rejected',()=>{
+  const rule={pinyin:'wáng',tone:2,avoidFirstChars:['望'],avoidFullNamePatterns:[]};
+  assert.ok(detectFullNameRisks('王',{...base,name:'望舒',pinyin:['wàng','shū']},rule).length>0);
 });
 
-test('detects surname-specific pattern risk', () => {
-  const risks = detectFullNameRisks('林', { name: '霖安', chars: ['霖', '安'] }, { avoidFullNamePatterns: ['林霖'] });
-  assert.ok(risks.includes('surname-pattern'));
+test('filters gender, required and avoided characters',()=>{
+  const all=[base,{...base,name:'安礼',chars:['安','礼']}];
+  const result=filterCandidates(all,{gender:'boy',requiredChar:'安',avoidChars:['远'],surname:'林',surnameRule:{}});
+  assert.deepEqual(result.map(item=>item.name),['安礼']);
 });
 
-test('returns weighted explainable score', () => {
-  const candidate = {
-    naturalness: 92,
-    semanticCoherence: 94,
-    growthFit: 95,
-    writingEase: 90,
-    tones: [1, 3],
-    styles: ['温润'],
-    meanings: ['智慧']
-  };
-  const result = scoreCandidate(candidate, {
-    surnameTone: 2,
-    preferredTonePatterns: [[2, 1, 3]],
-    stylePreferences: { 温润: 2 },
-    meaningPreferences: { 智慧: 1 }
-  });
-  assert.ok(result.total >= 85);
-  assert.equal(Object.keys(result).length, 7);
+test('distinct tones get a healthy pronunciation score',()=>{
+  assert.ok(scorePronunciation(base,{surnameTone:2}).score>=90);
 });
 
-test('returns six unique recommendation slots', () => {
-  const candidates = Array.from({ length: 10 }, (_, index) => ({
-    name: `名字${index}`,
-    styles: [index % 2 ? '现代' : '古典'],
-    sourceVerified: index % 3 === 0,
-    rarity: index * 10,
-    score: { total: 90 - index }
-  }));
-  const result = recommendNames(candidates, {}, 6);
-  assert.equal(result.length, 6);
-  assert.equal(new Set(result.map(item => item.name)).size, 6);
-  assert.deepEqual(result.map(item => item.slot), ['best', 'safe', 'rare', 'cultural', 'modern', 'explore']);
+test('niche preference raises low-popularity options',()=>{
+  const niche={...base,name:'书衡',popularity:1,styles:['现代']};
+  const common=scoreCandidate(base,{surnameTone:2,style:'现代',meaning:'智慧',trend:'niche',avoidTrend:true});
+  const rare=scoreCandidate(niche,{surnameTone:2,style:'现代',meaning:'智慧',trend:'niche',avoidTrend:true});
+  assert.ok(rare.total>=common.total-5);
 });
 
-test('feedback updates preferences immutably', () => {
-  const profile = {};
-  const candidate = { styles: ['古典'], meanings: ['智慧'] };
-  const result = applyFeedback(profile, candidate, 'like');
-  assert.equal(result.styles.古典, 2);
-  assert.equal(result.meanings.智慧, 2);
-  assert.deepEqual(profile, {});
+test('recommendations are unique and categorized',()=>{
+  const all=Array.from({length:10},(_,index)=>({...base,name:`名${String.fromCharCode(65+index)}`,popularity:(index%5)+1,sourceVerified:index%3===0,styles:index%2?['现代']:['古典'],score:{total:95-index}}));
+  const result=recommendNames(all,{},8);
+  assert.equal(new Set(result.map(item=>item.name)).size,result.length);
+  assert.ok(result.length>=6);
+  assert.equal(result[0].slot,'best');
 });

@@ -1,38 +1,99 @@
-import { NAME_CANDIDATES } from './data/names.js';
-import { getSurnameRule } from './data/surnames.js';
-import { filterCandidates } from './engine/filter.js';
-import { scoreCandidate } from './engine/score.js';
-import { recommendNames } from './engine/recommend.js';
+import {NAME_CANDIDATES} from './data/names.js';
+import {getSurnameRule} from './data/surnames.js';
+import {filterCandidates} from './engine/filter.js';
+import {scoreCandidate} from './engine/score.js';
+import {recommendNames} from './engine/recommend.js';
 
-const $=s=>document.querySelector(s);
-const slotLabels={best:'最贴合',safe:'稳妥型',rare:'小众型',cultural:'文化型',modern:'现代型',explore:'探索型'};
+const $=selector=>document.querySelector(selector);
+const slotLabels={best:'最贴合',safe:'稳妥耐用',rare:'小众自然',cultural:'文化出处',modern:'现代简洁',literary:'书卷气',natural:'清朗自然',explore:'备选探索'};
 let current=[];
+let seed=0;
+let excluded=[];
 
 function getContext(){
   const surname=$('#surname').value.trim()||'林';
-  const gender=$('#gender').value;
-  const style=$('#style').value;
-  const meaning=$('#meaning').value;
-  const avoid=[...$('#avoid').value.trim()];
-  const required=$('#required').value.trim();
-  const rule=getSurnameRule(surname);
-  return {surname,gender,style,meaning,avoid,required,rule};
+  return {
+    surname,
+    gender:$('#gender').value,
+    style:$('#style').value,
+    meaning:$('#meaning').value,
+    trend:$('#trend').value,
+    required:$('#required').value.trim(),
+    avoid:[...$('#avoid').value.trim()],
+    avoidTrend:$('#avoid-trend').checked,
+    rule:getSurnameRule(surname)
+  };
+}
+
+function popularityText(value){
+  if(value>=5)return '较常见';
+  if(value>=3)return '接受度较高';
+  return '相对小众';
+}
+
+function pronunciationText(item){
+  if(item.score.pronunciation>=94)return '声调起伏清楚，音节边界自然';
+  if(item.score.pronunciation>=86)return '整体流畅，没有明显拗口';
+  return '音律一般，建议多读几遍确认';
 }
 
 function generate(){
-  const c=getContext();
-  let pool=filterCandidates(NAME_CANDIDATES,{surname:c.surname,surnameRule:c.rule,avoidChars:c.avoid,allowPolyphonic:false});
-  pool=pool.filter(x=>(c.gender==='neutral'||x.gender==='neutral'||x.gender===c.gender)&&(!c.required||x.chars.includes(c.required)));
-  pool=pool.map(x=>({...x,score:scoreCandidate(x,{surnameTone:c.rule.tone,preferredTonePatterns:c.rule.preferredTonePatterns,stylePreferences:{[c.style]:2},meaningPreferences:{[c.meaning]:2}})}));
-  current=recommendNames(pool,{},6);
-  $('#surname-note').textContent=`${c.surname}姓分析：${c.rule.note}`;
-  render();
+  const context=getContext();
+  let pool=filterCandidates(NAME_CANDIDATES,{
+    surname:context.surname,
+    surnameRule:context.rule,
+    gender:context.gender,
+    requiredChar:context.required,
+    avoidChars:context.avoid,
+    allowPolyphonic:false
+  });
+  pool=pool.map(candidate=>({...candidate,score:scoreCandidate(candidate,{
+    surnameTone:context.rule.tone,
+    style:context.style,
+    meaning:context.meaning,
+    trend:context.trend,
+    avoidTrend:context.avoidTrend
+  })}));
+  current=recommendNames(pool,{seed,excluded},8);
+  $('#surname-note-title').textContent=`${context.surname}姓推荐`;
+  $('#surname-note').textContent=`${context.rule.note} 已优先排除姓与名首字同音、明显谐音和生硬组合。`;
+  render(context);
 }
 
-function render(){
-  const surname=$('#surname').value.trim()||'林';
-  $('#recommendations').innerHTML=current.length?current.map((x,i)=>`<article class="card"><div class="slot">${slotLabels[x.slot]}</div><div class="score">${x.score.total}</div><h3>${surname}${x.name}</h3><p class="pinyin">${x.pinyin.join(' · ')}</p><div>${x.styles.map(t=>`<span class="tag">${t}</span>`).join('')}${x.meanings.map(t=>`<span class="tag">${t}</span>`).join('')}</div><p>自然度 ${x.score.naturalness} · 音律 ${x.score.pronunciation} · 语义 ${x.score.semantics}</p><p>${x.source?`出处：${x.source}`:'无可靠出处，按语言与审美规则推荐。'}</p><button class="secondary" onclick="window.addCompare(${i})">加入对比</button></article>`).join(''):'<div class="empty">当前条件下没有足够高质量的名字，请减少限制。</div>';
+function render(context){
+  $('#recommendations').innerHTML=current.length?current.map((item,index)=>`<article class="card">
+    <div class="slot">${slotLabels[item.slot]}</div>
+    <h3>${context.surname}${item.name}</h3>
+    <p class="pinyin">${item.pinyin.join(' · ')}</p>
+    <div class="tags">${item.styles.map(tag=>`<span class="tag">${tag}</span>`).join('')}${item.meanings.map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
+    <p class="meaning">${item.meaningText}</p>
+    <div class="facts"><b>读起来：</b>${pronunciationText(item)}。<br><b>现实使用：</b>${popularityText(item.popularity)}，成年后适用性${item.adult>=98?'很高':'较高'}。<br>${item.sourceVerified?`<span class="source"><b>可靠出处：</b>${item.source}</span>`:'<b>出处：</b>无直接可靠出处，按现代汉语语义与姓名习惯推荐。'}</div>
+    <div class="actions"><button class="secondary strong" data-compare="${index}">加入对比</button><button class="secondary" data-dislike="${index}">不喜欢</button></div>
+  </article>`).join(''):'<div class="panel empty">当前限制下没有足够高质量的名字，请取消指定字或减少避开字后再试。</div>';
+  document.querySelectorAll('[data-compare]').forEach(button=>button.addEventListener('click',()=>addCompare(Number(button.dataset.compare))));
+  document.querySelectorAll('[data-dislike]').forEach(button=>button.addEventListener('click',()=>dislike(Number(button.dataset.dislike))));
+  renderCompare(context.surname);
 }
-window.addCompare=i=>{const item=current[i];const selected=JSON.parse(localStorage.getItem('haoming.compare')||'[]');if(!selected.find(x=>x.name===item.name)&&selected.length<3)selected.push(item);localStorage.setItem('haoming.compare',JSON.stringify(selected));renderCompare()};
-function renderCompare(){const surname=$('#surname').value.trim()||'林';const selected=JSON.parse(localStorage.getItem('haoming.compare')||'[]');$('#compare').innerHTML=selected.length?selected.map(x=>`<div class="compare-item"><b>${surname}${x.name}</b><span>总分 ${x.score.total}</span><span>自然度 ${x.score.naturalness}</span><span>音律 ${x.score.pronunciation}</span><span>成长适配 ${x.score.growthFit}</span></div>`).join(''):'尚未选择名字。'}
-$('#generate').addEventListener('click',generate);$('#clear-compare').addEventListener('click',()=>{localStorage.removeItem('haoming.compare');renderCompare()});generate();renderCompare();
+
+function dislike(index){
+  excluded.push(current[index].name);
+  generate();
+}
+
+function addCompare(index){
+  const item=current[index];
+  const selected=JSON.parse(localStorage.getItem('haoming.compare.v3')||'[]');
+  if(!selected.find(entry=>entry.name===item.name)&&selected.length<3)selected.push(item);
+  localStorage.setItem('haoming.compare.v3',JSON.stringify(selected));
+  renderCompare(getContext().surname);
+}
+
+function renderCompare(surname){
+  const selected=JSON.parse(localStorage.getItem('haoming.compare.v3')||'[]');
+  $('#compare').innerHTML=selected.length?selected.map(item=>`<div class="compare-item"><b>${surname}${item.name}</b><span>自然度：${item.natural>=97?'很高':'较高'}</span><span>音律：${item.score.pronunciation>=94?'很顺':'自然'}</span><span>语义：${item.semantic>=97?'完整清晰':'清晰'}</span><span>成长适配：${item.adult>=98?'很高':'较高'}</span></div>`).join(''):'<div class="hint">尚未选择名字。</div>';
+}
+
+$('#generate').addEventListener('click',()=>{seed=0;excluded=[];generate()});
+$('#refresh').addEventListener('click',()=>{seed+=1;generate()});
+$('#clear-compare').addEventListener('click',()=>{localStorage.removeItem('haoming.compare.v3');renderCompare(getContext().surname)});
+generate();
