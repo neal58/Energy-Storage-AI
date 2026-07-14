@@ -1,0 +1,198 @@
+(function(root,factory){
+  const api=factory();
+  if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  else root.HaoMingEngine=api;
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
+'use strict';
+
+const SURNAME={
+陈:['chén',2],林:['lín',2],王:['wáng',2],李:['lǐ',3],张:['zhāng',1],刘:['liú',2],杨:['yáng',2],黄:['huáng',2],赵:['zhào',4],周:['zhōu',1],吴:['wú',2],徐:['xú',2],孙:['sūn',1],胡:['hú',2],朱:['zhū',1],高:['gāo',1],何:['hé',2],郭:['guō',1],罗:['luó',2],梁:['liáng',2],宋:['sòng',4],郑:['zhèng',4],谢:['xiè',4],韩:['hán',2],唐:['táng',2],沈:['shěn',3],苏:['sū',1],江:['jiāng',1],许:['xǔ',3],邓:['dèng',4],冯:['féng',2],曹:['cáo',2],彭:['péng',2],曾:['zēng',1],肖:['xiāo',1],田:['tián',2],董:['dǒng',3],潘:['pān',1],袁:['yuán',2],蔡:['cài',4],蒋:['jiǎng',3],余:['yú',2],于:['yú',2],叶:['yè',4],程:['chéng',2],魏:['wèi',4],丁:['dīng',1],任:['rèn',4],卢:['lú',2],姚:['yáo',2]
+};
+
+const MATERNAL={
+林:['自然舒展','成长','清润'],江:['自然舒展','开阔','流动'],周:['耐看自然','品格','秩序'],杨:['成长','明亮','向上'],李:['成长','丰实'],王:['大气稳重','责任'],陈:['大气稳重','沉静'],苏:['温润清雅','舒展'],沈:['书卷文化','沉静'],许:['书卷文化','希望'],叶:['自然舒展','成长'],何:['温润清雅','和悦']
+};
+
+const PINYIN={
+清:['qīng',1],和:['hé',2],嘉:['jiā',1],言:['yán',2],安:['ān',1],宁:['níng',2],允:['yǔn',3],敬:['jìng',4],予:['yǔ',3],亦:['yì',4],舒:['shū',1],若:['ruò',4],
+思:['sī',1],齐:['qí',2],明:['míng',2],哲:['zhé',2],知:['zhī',1],远:['yuǎn',3],行:['xíng',2],见:['jiàn',4],微:['wēi',1],许:['xǔ',3],书:['shū',1],衡:['héng',2],文:['wén',2],令:['lìng',4],闻:['wén',2],景:['jǐng',3],既:['jì',4],斯:['sī',1],年:['nián',2],维:['wéi',2],桢:['zhēn',1],有:['yǒu',3],初:['chū',1],
+越:['yuè',4],晏:['yàn',4],扬:['yáng',2],澈:['chè',4],澄:['chéng',2],昭:['zhāo',1],华:['huá',2],云:['yún',2],朗:['lǎng',3],然:['rán',2],
+修:['xiū',1],弘:['hóng',2],毅:['yì',4],守:['shǒu',3],正:['zhèng',4],承:['chéng',2],谦:['qiān',1],怀:['huái',2],谨:['jǐn',3],礼:['lǐ',3],树:['shù',4],松:['sōng',1],信:['xìn',4],
+南:['nán',2],乔:['qiáo',2],禾:['hé',2],起:['qǐ',3],川:['chuān',1],竹:['zhú',2],溪:['xī',1],月:['yuè',4],
+静:['jìng',4],姝:['shū',1],仪:['yí',2],攸:['yōu',1],卉:['huì',4],妍:['yán',2],婉:['wǎn',3],望:['wàng',4],歌:['gē',1],宜:['yí',2],柔:['róu',2],如:['rú',2],
+念:['niàn',4],映:['yìng',4],真:['zhēn',1],一:['yī',1],善:['shàn',4],成:['chéng',2],卓:['zhuó',2],达:['dá',2],新:['xīn',1],舟:['zhōu',1],山:['shān',1],恺:['kǎi',3],朴:['pǔ',3],
+珩:['héng',2],瑾:['jǐn',3],均:['jūn',1],谷:['gǔ',3],星:['xīng',1],野:['yě',3],温:['wēn',1],恬:['tián',2],悠:['yōu',1],可:['kě',3],心:['xīn',1],
+辰:['chén',2],良:['liáng',2],德:['dé',2],泽:['zé',2],谕:['yù',4],希:['xī',1],悦:['yuè',4],芷:['zhǐ',3],晴:['qíng',2],诗:['shī',1],语:['yǔ',3],桐:['tóng',2],沐:['mù',4],阳:['yáng',2]
+};
+
+const CHAR_MEANING={
+清:'清正澄明',和:'温和有度',嘉:'美好可嘉',言:'真诚善言',安:'安定从容',宁:'宁静笃定',允:'诚信公允',敬:'敬慎有礼',予:'温厚给予',亦:'从容自然',舒:'舒展从容',若:'温和自持',
+思:'善思明辨',齐:'见贤思齐',明:'明朗通达',哲:'明智通透',知:'求知明理',远:'目光长远',行:'知行相济',见:'洞察理解',微:'见微知著',许:'期许与笃定',书:'学识涵养',衡:'懂得权衡',文:'文雅有识',令:'美好端正',闻:'有声望与见识',景:'光明开阔',既:'坚定清明',斯:'温雅从容',年:'岁月安稳',维:'维系担当',桢:'坚实栋梁',有:'保有初心',初:'初心与新生',
+越:'清越高朗',晏:'安宁和悦',扬:'清扬明朗',澈:'通透明澈',澄:'澄澈安定',昭:'光明显著',华:'光华美好',云:'自在舒展',朗:'明朗开阔',然:'自然从容',
+修:'修身自持',弘:'胸襟弘远',毅:'坚毅笃定',守:'坚守原则',正:'端正守正',承:'担当传承',谦:'谦逊有度',怀:'胸怀温厚',谨:'谨慎自律',礼:'知礼有度',树:'向上生长',松:'坚韧挺拔',信:'诚信可靠',
+南:'温暖开阔',乔:'高木向上',禾:'生长丰收',起:'向上生发',川:'开阔流动',竹:'清正坚韧',溪:'清澈灵动',月:'清朗温柔',
+静:'沉静自持',姝:'美好端庄',仪:'仪度端方',攸:'从容安适',卉:'草木生机',妍:'清秀美好',婉:'温婉得体',望:'心有远望',歌:'明朗自在',宜:'合宜得体',柔:'温柔坚韧',如:'从容自然',
+念:'不忘初心',映:'明亮映照',真:'真诚清正',一:'专一纯粹',善:'善良向善',成:'成长成就',卓:'卓然向上',达:'通达明理',新:'新生向上',舟:'笃定前行',山:'沉稳坚定',恺:'宽厚和乐',朴:'质朴真诚',
+瑾:'美玉之德',均:'平正均衡',谷:'谦逊包容',星:'明亮有光',野:'开阔自由',温:'温润宽和',恬:'安静从容',悠:'从容舒展',可:'可亲可敬',心:'真诚本心',
+辰:'时光星辰',良:'善良美好',德:'品德端正',泽:'润泽包容',谕:'明理通达',希:'希望明亮',悦:'喜悦开朗',芷:'清芳雅正',晴:'明朗晴和',诗:'诗书涵养',语:'善于表达',桐:'挺拔清雅',沐:'温润清新',阳:'明亮温暖'
+};
+
+const SOURCES={
+思齐:'《论语》“见贤思齐焉”',明哲:'《诗经·大雅》“既明且哲”',景明:'范仲淹《岳阳楼记》“春和景明”',修远:'屈原《离骚》“路漫漫其修远兮”',弘毅:'《论语》“士不可以不弘毅”',嘉言:'朱熹《朱子全书》“嘉言善行”',景行:'《诗经·小雅》“高山仰止，景行行止”',令闻:'《诗经·大雅》“令闻不已”',既明:'《诗经·大雅》“既明且哲”',维桢:'《诗经·大雅》“王国克生，维周之桢”',斯年:'《诗经·大雅》“于万斯年”',有初:'《诗经·大雅》“靡不有初”',清扬:'《诗经·郑风》“有美一人，清扬婉兮”',静姝:'《诗经·邶风》“静女其姝”',令仪:'《诗经·小雅》“莫不令仪”',攸宁:'《诗经·小雅》“君子攸宁”',嘉卉:'《诗经·小雅》“山有嘉卉”',南乔:'《诗经·周南》“南有乔木”',望舒:'屈原《离骚》“前望舒使先驱兮”',安歌:'屈原《九歌》“疏缓节兮安歌”',宜修:'屈原《九歌》“美要眇兮宜修”',柔嘉:'《诗经·大雅》“柔嘉维则”',嘉树:'屈原《橘颂》“后皇嘉树”',怀信:'屈原《九章》“怀信侘傺”',怀瑾:'屈原《九章》“怀瑾握瑜”',若谷:'《道德经》“上德若谷”'
+};
+
+const GROUPS=[
+{names:'清和 嘉言 安和 嘉宁 安宁 安然 允和 允宁 敬和 敬安 予安 予宁 亦安 亦宁 舒宁 若宁'.split(' '),gender:'neutral',styles:['耐看自然','温润清雅'],meanings:['平安','从容','品格'],birth:['安宁','温和'],quality:97,popularity:3},
+{names:'思齐 明哲 知远 见微 书衡 允文'.split(' '),gender:'neutral',styles:['书卷文化','耐看自然'],meanings:['智慧','品格','志向'],birth:['明晰','进取'],quality:97,popularity:2},
+{names:'令闻 景行 知行 既明 斯年 维桢 有初 若谷'.split(' '),gender:'neutral',styles:['书卷文化','古典雅致'],meanings:['智慧','品格','志向'],birth:['明晰','坚定'],quality:95,popularity:1},
+{names:'景明 清越 清晏 清扬 明澈 景澄 明澄 昭宁 昭华 云朗 清朗 朗然'.split(' '),gender:'neutral',styles:['清朗明亮','古典雅致'],meanings:['光明','从容'],birth:['明朗','澄澈','晨光'],quality:95,popularity:2},
+{names:'修远 弘毅 守正 明远 思远 承安 承远 承宁 明谦 怀谦 谨言 安礼 景远 松远 怀信 怀瑾'.split(' '),gender:'boy',styles:['大气稳重','书卷文化'],meanings:['志向','责任','品格'],birth:['坚定','进取','深远'],quality:97,popularity:2},
+{names:'云舒 南乔 嘉禾 嘉树 云起 清川 景川 云川 禾宁 禾安 乔安 川宁 松宁 竹宁 竹清 星野'.split(' '),gender:'neutral',styles:['自然舒展','现代轻盈'],meanings:['成长','从容','光明'],birth:['生长','流动','开阔'],quality:94,popularity:2},
+{names:'静姝 令仪 攸宁 嘉卉 清妍 婉清 静宜 书仪 南乔 云舒 清扬 望舒 安歌 宜修 柔嘉 婉如 晏如 嘉月 若安 清宜 昭仪 嘉仪'.split(' '),gender:'girl',styles:['温润清雅','古典雅致'],meanings:['品格','平安','从容'],birth:['温和','安宁','清润'],quality:97,popularity:2},
+{names:'念初 初宁 初安 知许 闻溪 映真 一澄 一宁 一禾 亦安 亦宁 若宁 舒宁 云宁 予安 予宁 书宁 清宁 嘉悦 安悦 舒然 若清'.split(' '),gender:'neutral',styles:['现代轻盈'],meanings:['成长','平安','从容','光明'],birth:['初始','清润','安宁'],quality:92,popularity:3},
+{names:'景行 知远 修远 弘毅 明哲 守正 承安 思远 明远 怀谦 明谦 谨言 安礼 嘉树 允文 既明 维桢 斯年 怀信 怀瑾 若谷'.split(' '),gender:'boy',styles:['大气稳重','书卷文化'],meanings:['智慧','志向','品格'],birth:['坚定','进取'],quality:98,popularity:2},
+{names:'温言 温宁 恬宁 悠然 可心 诗宁 语安 语宁 芷晴 沐阳'.split(' '),gender:'girl',styles:['温润清雅','现代轻盈'],meanings:['平安','光明','从容'],birth:['温和','明朗'],quality:91,popularity:4}
+];
+
+const QUALITY_OVERRIDES={清和:99,嘉言:98,思齐:99,明哲:98,知远:98,景行:95,知行:94,修远:99,弘毅:98,守正:98,静姝:99,令仪:98,攸宁:98,清妍:98,婉清:97,南乔:97,云舒:97,清扬:98,望舒:97,安歌:96,宜修:96,柔嘉:97,嘉树:98,怀瑾:97,若谷:95,既明:96,斯年:94,维桢:94,有初:94,令闻:95,知许:91,闻溪:90,映真:91,念初:92,一澄:91,星野:90,芷晴:91,沐阳:91};
+const POPULARITY_OVERRIDES={安然:5,嘉宁:4,若宁:4,舒宁:4,予安:4,予宁:4,南乔:4,云舒:4,一宁:5,语宁:5,芷晴:5,沐阳:5,知许:4,闻溪:4,念初:4};
+
+const records=new Map();
+for(const group of GROUPS){
+  for(const name of group.names){
+    const existing=records.get(name)||{name,gender:group.gender,styles:[],meanings:[],birth:[],quality:0,popularity:group.popularity};
+    existing.gender=existing.gender===group.gender?existing.gender:(existing.gender==='neutral'?group.gender:(group.gender==='neutral'?existing.gender:'neutral'));
+    existing.styles=[...new Set([...existing.styles,...group.styles])];
+    existing.meanings=[...new Set([...existing.meanings,...group.meanings])];
+    existing.birth=[...new Set([...existing.birth,...group.birth])];
+    existing.quality=Math.max(existing.quality,QUALITY_OVERRIDES[name]||group.quality);
+    existing.popularity=Math.max(existing.popularity,POPULARITY_OVERRIDES[name]||group.popularity);
+    existing.source=SOURCES[name]||'';
+    records.set(name,existing);
+  }
+}
+const CORPUS=[...records.values()];
+
+const DIRECT={
+林:['林安','林宁','林清','林和','林远','林溪'],江:['江宁','江远','江清','江禾','江月'],沈:['沈宁','沈安','沈清','沈远'],苏:['苏安','苏和','苏清','苏宜'],叶:['叶安','叶宁','叶清','叶禾']
+};
+
+const RISK_FULL=new Set(['吴能','吴用','朱逸群','史珍香','杜子腾','苏宁']);
+const RISK_GIVEN=new Set(['思善','景成','宁澄','怀真','书然','承和','和朗','宁朗']);
+
+function stripTone(text=''){return text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+function initialOf(pinyin=''){
+  const plain=stripTone(pinyin);const initials=['zh','ch','sh','b','p','m','f','d','t','n','l','g','k','h','j','q','x','r','z','c','s','y','w'];
+  return initials.find(x=>plain.startsWith(x))||'';
+}
+function finalOf(pinyin=''){const plain=stripTone(pinyin);const initial=initialOf(pinyin);return plain.slice(initial.length);}
+function charPinyin(ch){return PINYIN[ch]||[ch,0];}
+function namePinyin(name){return [...name].map(charPinyin);}
+function genderFits(candidate,input){return input.gender==='neutral'||candidate.gender==='neutral'||candidate.gender===input.gender;}
+function intersects(a=[],b=[]){return a.filter(x=>b.includes(x));}
+
+function season(month){return[3,4,5].includes(month)?['生长','清润','温和']:[6,7,8].includes(month)?['明朗','开阔','光明']:[9,10,11].includes(month)?['澄澈','收获','坚定']:['沉静','安宁','坚韧'];}
+function period(hour){return hour>=5&&hour<9?['晨光','初始','明朗']:hour>=9&&hour<17?['开阔','进取','明晰']:hour>=17&&hour<21?['温和','安宁','从容']:['沉静','清润','安宁'];}
+
+function toneReview(surname,name){
+  const sp=SURNAME[surname]||SURNAME[surname[0]]||['',0];
+  const ps=namePinyin(name);const tones=[sp[1],...ps.map(x=>x[1])].filter(Boolean);
+  let score=100;const warnings=[];
+  if(tones.length>=3&&new Set(tones).size===1)return{passed:false,score:0,warnings:['全名声调过于平直'],pinyin:[sp[0],...ps.map(x=>x[0])].filter(Boolean)};
+  for(let i=1;i<tones.length;i++){
+    if(tones[i]===tones[i-1]){score-=6;warnings.push('相邻声调略有重复');}
+    if(tones[i]===3&&tones[i-1]===3){score-=7;warnings.push('连续上声，连读需注意');}
+  }
+  if(sp[0]&&ps[0]){
+    if(stripTone(sp[0])===stripTone(ps[0][0]))return{passed:false,score:0,warnings:['姓与名首字同音'],pinyin:[sp[0],...ps.map(x=>x[0])].filter(Boolean)};
+    if(finalOf(sp[0])===finalOf(ps[0][0])){score-=5;warnings.push('姓与名首字韵母接近');}
+    if(initialOf(sp[0])&&initialOf(sp[0])===initialOf(ps[0][0])){score-=3;warnings.push('姓与名首字声母接近');}
+  }
+  if(ps.length===2){
+    if(finalOf(ps[0][0])===finalOf(ps[1][0])){score-=5;warnings.push('名字两字韵母接近');}
+    if(initialOf(ps[0][0])&&initialOf(ps[0][0])===initialOf(ps[1][0])){score-=3;warnings.push('名字两字声母接近');}
+  }
+  if(new Set(tones).size===tones.length)score+=2;
+  return{passed:true,score:Math.max(70,Math.min(100,score)),warnings:[...new Set(warnings)],pinyin:[sp[0],...ps.map(x=>x[0])].filter(Boolean)};
+}
+
+function fullSurname(input){
+  if(input.surnameMode==='mother')return input.motherSurname;
+  if(input.surnameMode==='double')return `${input.fatherSurname}${input.motherSurname}`;
+  return input.fatherSurname;
+}
+function profile(input){
+  const date=input.birthDate||'2026-01-01',time=input.birthTime||'12:00';
+  const month=Number(date.split('-')[1]||1),hour=Number(time.split(':')[0]||12);
+  return input.traditionalReference===false?[]:[...season(month),...period(hour)];
+}
+function meaningText(name){
+  const parts=[...name].map(ch=>CHAR_MEANING[ch]||ch);
+  if(parts.length===1)return parts[0]+'，简洁而有分寸。';
+  return `${parts[0]}，${parts[1]}；整体含义自然连贯，不靠生僻字制造独特感。`;
+}
+function buildDirectRecords(input){
+  if(input.maternalMode!=='direct')return[];
+  const names=DIRECT[input.motherSurname]||[];
+  return names.map(name=>({name,gender:'neutral',styles:['父母纪念','耐看自然'],meanings:['平安','品格'],birth:['安宁','清润'],quality:91,popularity:2,source:''}));
+}
+
+function scoreRecord(record,input){
+  const surname=fullSurname(input);const full=surname+record.name;
+  if(RISK_FULL.has(full)||RISK_GIVEN.has(record.name))return null;
+  if((input.excludedNames||[]).includes(record.name))return null;
+  if(input.requiredChar&&!record.name.includes(input.requiredChar))return null;
+  const avoid=new Set([...(input.avoidChars||'')]);if([...record.name].some(ch=>avoid.has(ch)))return null;
+  const taboos=(input.customTaboos||'').split(/[，,\s]+/).filter(Boolean);if(taboos.some(x=>full.includes(x)))return null;
+  if(!genderFits(record,input))return null;
+  if([...record.name].some(ch=>['行','乐','重','长'].includes(ch)))return null;
+  const sound=toneReview(surname,record.name);if(!sound.passed)return null;
+  const birthTags=profile(input);const maternalTags=input.maternalMode==='symbolic'?(MATERNAL[input.motherSurname]||[]):[];
+  const birthHit=intersects(record.birth,birthTags);const maternalHit=[...new Set([...intersects(record.styles,maternalTags),...intersects(record.meanings,maternalTags),...intersects(record.birth,maternalTags)])];
+  let score=record.quality*0.62+sound.score*0.22;
+  if(record.styles.includes(input.style))score+=12;else score-=2;
+  if(record.meanings.includes(input.meaning))score+=8;
+  if(input.gender!=='neutral'){if(record.gender===input.gender)score+=8;else if(record.gender==='neutral')score-=1;}
+  score+=Math.min(4,birthHit.length*1.5);
+  score+=Math.min(3,maternalHit.length*1.5);
+  if(input.avoidTrend&&record.popularity>=4)score-=4+(record.popularity-4)*2;
+  if(record.source)score+=1;
+  return{...record,fullName:full,score,sound,birthHit,maternalHit,pinyin:sound.pinyin.join(' · '),meaningText:meaningText(record.name)};
+}
+
+function diversify(ranked){
+  const pool=[...ranked],selected=[];const firstCount=new Map();
+  while(pool.length&&selected.length<24){
+    let bestIndex=0,bestAdjusted=-Infinity;
+    for(let i=0;i<pool.length;i++){
+      const item=pool[i];const first=item.name[0];
+      const penalty=(firstCount.get(first)||0)*4+selected.filter(x=>x.styles[0]===item.styles[0]).length*0.7;
+      const adjusted=item.score-penalty;
+      if(adjusted>bestAdjusted){bestAdjusted=adjusted;bestIndex=i;}
+    }
+    const [chosen]=pool.splice(bestIndex,1);selected.push(chosen);firstCount.set(chosen.name[0],(firstCount.get(chosen.name[0])||0)+1);
+  }
+  return selected;
+}
+function category(item,input){
+  if(item.maternalHit.length)return'父母纪念';
+  if(item.birthHit.length>=2)return'出生意象';
+  if(item.source)return'文化出处';
+  if(item.styles.includes(input.style))return input.style;
+  if(item.quality>=97)return'耐看首选';
+  return'值得考虑';
+}
+function recommend(input,batch=0,limit=6){
+  const candidates=[...CORPUS,...buildDirectRecords(input)]
+    .filter(x=>x.quality>=90)
+    .map(x=>scoreRecord(x,input)).filter(Boolean)
+    .sort((a,b)=>b.score-a.score||b.quality-a.quality||a.name.localeCompare(b.name,'zh-CN'));
+  const diverse=diversify(candidates);
+  const offset=(Math.max(0,batch)*limit)%Math.max(limit,diverse.length||limit);
+  let page=diverse.slice(offset,offset+limit);
+  if(page.length<limit&&diverse.length>limit)page=[...page,...diverse.slice(0,limit-page.length)];
+  return page.map(x=>({...x,category:category(x,input)}));
+}
+
+return{SURNAME,MATERNAL,PINYIN,CORPUS,toneReview,recommend,profile,fullSurname};
+});
