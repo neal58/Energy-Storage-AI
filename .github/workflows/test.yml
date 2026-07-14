@@ -2,7 +2,7 @@ name: Test
 on:
   pull_request:
   push:
-    branches: [main, feature/dynamic-naming-engine]
+    branches: [main]
 jobs:
   test:
     runs-on: ubuntu-latest

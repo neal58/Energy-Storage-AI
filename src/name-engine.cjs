@@ -1,42 +1,4 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>好名有解｜动态宝宝取名</title>
-<style>*{box-sizing:border-box}:root{--bg:#f3efe7;--card:#fffdf9;--ink:#1c2922;--muted:#66726b;--green:#244d3b;--green2:#dce8df;--gold:#9a7040;--line:#ddd3c3}body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",sans-serif}.wrap{max-width:1180px;margin:auto;padding:18px}header,.form-card,.summary,article,.empty{background:var(--card);border:1px solid var(--line);border-radius:20px}header{padding:30px 34px;margin-bottom:16px;background:linear-gradient(135deg,#fffdf8,#e5ede7)}header h1{font:700 36px/1.2 "Songti SC",serif;margin:8px 0}header p{margin:0;color:var(--muted);line-height:1.7}.eyebrow,.category{font-size:12px;color:var(--gold);font-weight:800;letter-spacing:.09em}.form-card{padding:20px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}label{font-size:13px;font-weight:700;display:flex;flex-direction:column;gap:6px}label small{font-weight:400;color:#9b5d36;line-height:1.4}input,select{width:100%;border:1px solid #d3cab9;background:#fff;border-radius:10px;padding:10px;color:var(--ink)}label.check{flex-direction:row;align-items:center;padding-top:25px;font-weight:500}label.check input{width:auto}button{border:0;border-radius:10px;padding:12px 18px;margin-top:16px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}.secondary{background:#fff;color:var(--green);border:1px solid var(--green);margin-left:8px}.minor{margin:0;padding:8px 11px;background:#fff;color:var(--muted);border:1px solid var(--line);font-size:12px}.privacy{font-size:12px;color:var(--muted);margin-top:12px}.summary{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:15px 18px;margin:14px 0;color:var(--muted);font-size:13px}.summary b{color:var(--ink)}.summary em{font-style:normal;color:#8e5e38}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}article{padding:20px}article h2{font:700 30px "Songti SC",serif;margin:6px 0 2px}.pinyin{font-size:12px;color:var(--muted);margin-bottom:10px}.meaning{line-height:1.72;margin:10px 0}.reason-tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 13px}.reason-tags span{font-size:11px;background:var(--green2);color:var(--green);padding:5px 8px;border-radius:999px}dl{margin:0;padding-top:11px;border-top:1px dashed var(--line);display:grid;grid-template-columns:80px 1fr;gap:6px 8px;font-size:13px}dt{font-weight:800}dd{margin:0;color:var(--muted);line-height:1.55}.actions{margin-top:13px}.empty{padding:28px;text-align:center;color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.wrap{padding:10px}header{padding:22px 18px}header h1{font-size:30px}.grid,.cards{grid-template-columns:1fr}.secondary{margin-left:4px}label.check{padding-top:0}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header><div class="eyebrow">动态取名引擎 · 审美质量版</div><h1>好名有解</h1><p>不再按标签随意拼字。先通过整名自然度和读感门槛，再结合父母姓氏、出生时段和审美偏好复排。</p></header>
-<main>
-<section class="form-card">
-<div class="grid">
-<label>父亲姓氏<input id="father-surname" value="陈" maxlength="2"></label>
-<label>母亲姓氏<input id="mother-surname" value="林" maxlength="2"></label>
-<label>孩子姓氏<select id="surname-mode"><option value="father">随父姓</option><option value="mother">随母姓</option><option value="double">父母双姓</option></select><small id="name-length-note"></small></label>
-<label>母姓参与<select id="maternal-mode"><option value="none">不参与名字</option><option value="symbolic" selected>意象纪念</option><option value="direct">直接作为名字首字</option></select></label>
-<label>性别倾向<select id="gender"><option value="neutral">中性均可</option><option value="boy">男孩</option><option value="girl">女孩</option></select></label>
-<label>出生日期<input id="birth-date" type="date" value="2026-07-14"></label>
-<label>出生时间<input id="birth-time" type="time" value="19:20"></label>
-<label>出生地时区<select id="timezone"><option value="+08:00">中国 UTC+8</option><option value="+09:00" selected>印尼东部 UTC+9</option><option value="+07:00">印尼西部 UTC+7</option></select></label>
-<label class="check"><input id="traditional-reference" type="checkbox" checked>启用季节与时辰参考</label>
-<label>审美方向<select id="style"><option selected>耐看自然</option><option>温润清雅</option><option>书卷文化</option><option>清朗明亮</option><option>大气稳重</option><option>现代轻盈</option><option>自然舒展</option><option>古典雅致</option></select></label>
-<label>核心寓意<select id="meaning"><option>智慧</option><option selected>品格</option><option>志向</option><option>平安</option><option>光明</option><option>成长</option><option>从容</option><option>责任</option></select></label>
-<label>指定字<input id="required-char" maxlength="1" placeholder="可选"></label>
-<label>避开字<input id="avoid-chars" placeholder="如：梓轩"></label>
-<label>家庭避讳词<input id="custom-taboos" placeholder="用逗号分隔"></label>
-<label class="check"><input id="avoid-trend" type="checkbox" checked>降低近年高频网红名权重</label>
-</div>
-<button id="generate">重新生成</button><button id="refresh" class="secondary">换一组</button>
-<div class="privacy">每次只展示6个达到门槛的候选；点击“不喜欢”后，本次会立即排除该名字。信息只在浏览器内计算。</div>
-</section>
-<section id="birth-summary" class="summary"></section>
-<section id="recommendations" class="cards"></section>
-</main>
-</div>
-<script>(function(root,factory){
+(function(root,factory){
   const api=factory();
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
   else root.HaoMingEngine=api;
@@ -234,41 +196,3 @@ function recommend(input,batch=0,limit=6){
 
 return{SURNAME,MATERNAL,PINYIN,CORPUS,toneReview,recommend,profile,fullSurname};
 });
-</script>
-<script>(function(){
-'use strict';
-const E=globalThis.HaoMingEngine;
-if(!E)throw new Error('HaoMingEngine 未加载');
-const $=id=>document.getElementById(id);
-let batch=0;
-let excluded=[];
-
-function esc(text=''){return String(text).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
-function readInput(){return{
- fatherSurname:$('father-surname').value.trim()||'陈',motherSurname:$('mother-surname').value.trim()||'林',surnameMode:$('surname-mode').value,
- maternalMode:$('maternal-mode').value,gender:$('gender').value,birthDate:$('birth-date').value,birthTime:$('birth-time').value,
- timezone:$('timezone').value,traditionalReference:$('traditional-reference').checked,style:$('style').value,meaning:$('meaning').value,
- requiredChar:$('required-char').value.trim(),avoidChars:$('avoid-chars').value.trim(),customTaboos:$('custom-taboos').value.trim(),
- avoidTrend:$('avoid-trend').checked,excludedNames:excluded
-};}
-function summary(input){
- const tags=E.profile(input);const surname=E.fullSurname(input);const maternal=input.maternalMode==='symbolic'?(E.MATERNAL[input.motherSurname]||[]):[];
- $('birth-summary').innerHTML=`<b>${esc(surname)}姓 · 本次筛选依据</b><span>审美：${esc(input.style)}</span><span>寓意：${esc(input.meaning)}</span><span>出生参考：${esc(tags.join('、')||'未启用')}</span><span>母姓纪念：${esc(maternal.join('、')||'未启用')}</span><em>名字自然度与全名读感优先，出生信息只做小幅复排。</em>`;
-}
-function render(){
- const input=readInput();const results=E.recommend(input,batch,6);summary(input);
- $('recommendations').innerHTML=results.length?results.map(item=>{
-  const source=item.source?item.source:'无直接可靠出处，按现代汉语语义和现实姓名习惯推荐。';
-  const evidence=[item.styles.includes(input.style)?`符合“${input.style}”`:item.styles[0],item.meanings.includes(input.meaning)?`侧重${input.meaning}`:'语义完整',item.birthHit.length?`呼应${item.birthHit.join('、')}`:'出生信息未强行干预',item.maternalHit.length?`呼应母姓意象${item.maternalHit.join('、')}`:''].filter(Boolean);
-  return `<article><div class="category">${esc(item.category)}</div><h2>${esc(item.fullName)}</h2><div class="pinyin">${esc(item.pinyin)}</div><p class="meaning">${esc(item.meaningText)}</p><div class="reason-tags">${evidence.map(x=>`<span>${esc(x)}</span>`).join('')}</div><dl><dt>全名读感</dt><dd>${item.sound.warnings.length?`整体可读；需留意：${esc(item.sound.warnings.join('、'))}`:'声调有起伏，连读自然，没有明显同音硬伤。'}</dd><dt>文化出处</dt><dd>${esc(source)}</dd></dl><div class="actions"><button class="minor dislike" data-name="${esc(item.name)}">不喜欢这个名字</button></div></article>`;
- }).join(''):'<div class="empty">当前条件下没有达到自然度门槛的名字。可以取消指定字、减少避讳字，或换一种审美方向。</div>';
- document.querySelectorAll('.dislike').forEach(btn=>btn.addEventListener('click',()=>{excluded=[...new Set([...excluded,btn.dataset.name])];batch=0;render();}));
-}
-$('generate').addEventListener('click',()=>{batch=0;excluded=[];render();});
-$('refresh').addEventListener('click',()=>{batch+=1;render();});
-$('surname-mode').addEventListener('change',event=>{if(event.target.value==='double')$('name-length-note').textContent='双姓已较长，建议优先使用单字名；本版仍生成双字名供比较。';else $('name-length-note').textContent='';});
-render();
-})();
-</script>
-</body>
-</html>
