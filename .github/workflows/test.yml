@@ -18,15 +18,40 @@ jobs:
       - name: Build standalone page
         run: npm run build
       - name: Test audited name corpus
+        if: always()
         run: node --test tests/name-engine.test.cjs
-      - name: Test five naming methods
-        run: node --test tests/book-engine.test.cjs
+      - name: Test naming brief
+        if: always()
+        run: node --test --test-name-pattern="builds a clear naming brief" tests/book-engine.test.cjs
+      - name: Test five route definitions
+        if: always()
+        run: node --test --test-name-pattern="five naming methods" tests/book-engine.test.cjs
+      - name: Test route differentiation
+        if: always()
+        run: node --test --test-name-pattern="changing naming method" tests/book-engine.test.cjs
+      - name: Test generation and elder taboos
+        if: always()
+        run: node --test --test-name-pattern="generation character" tests/book-engine.test.cjs
+      - name: Test birth influence cap
+        if: always()
+        run: node --test --test-name-pattern="birth evidence" tests/book-engine.test.cjs
+      - name: Test birth route explanation
+        if: always()
+        run: node --test --test-name-pattern="xin route" tests/book-engine.test.cjs
+      - name: Test source integrity
+        if: always()
+        run: node --test --test-name-pattern="source type" tests/book-engine.test.cjs
+      - name: Test preference feedback
+        if: always()
+        run: node --test --test-name-pattern="feedback can exclude" tests/book-engine.test.cjs
       - name: Test interface controls
+        if: always()
         run: node --test tests/ui-smoke.test.js
       - name: Test standalone output
+        if: always()
         run: node --test tests/build.test.js
       - name: Commit generated standalone page
-        if: github.event_name == 'push' && github.ref_name == 'feature/book-grounded-naming-v6'
+        if: github.event_name == 'push' && github.ref_name == 'feature/book-grounded-naming-v6' && success()
         run: |
           if git diff --quiet -- index.html; then
             echo "index.html already current"
