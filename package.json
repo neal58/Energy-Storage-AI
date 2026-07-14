@@ -1,10 +1,10 @@
 {
-  "name": "haoming-dynamic-engine",
+  "name": "haoming-book-grounded-engine",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test",
+    "test": "node --test tests/name-engine.test.cjs tests/book-engine.test.cjs tests/build.test.js tests/ui-smoke.test.js",
     "build": "node scripts/build-single-html.mjs",
-    "check": "npm test && npm run build && npm test"
+    "check": "npm run build && npm test"
   }
 }
