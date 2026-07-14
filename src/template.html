@@ -1,1 +1,41 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>好名有解｜动态宝宝取名</title><style>__INLINE_CSS__</style></head><body><div id="app"></div><script src="https://cdn.jsdelivr.net/gh/6tail/lunar-javascript@v1.7.7/lunar.js"></script><script type="module" src="__APP_MODULE__"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>好名有解｜动态宝宝取名</title>
+<style>__INLINE_CSS__</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="eyebrow">动态取名引擎 · 审美质量版</div><h1>好名有解</h1><p>不再按标签随意拼字。先通过整名自然度和读感门槛，再结合父母姓氏、出生时段和审美偏好复排。</p></header>
+<main>
+<section class="form-card">
+<div class="grid">
+<label>父亲姓氏<input id="father-surname" value="陈" maxlength="2"></label>
+<label>母亲姓氏<input id="mother-surname" value="林" maxlength="2"></label>
+<label>孩子姓氏<select id="surname-mode"><option value="father">随父姓</option><option value="mother">随母姓</option><option value="double">父母双姓</option></select><small id="name-length-note"></small></label>
+<label>母姓参与<select id="maternal-mode"><option value="none">不参与名字</option><option value="symbolic" selected>意象纪念</option><option value="direct">直接作为名字首字</option></select></label>
+<label>性别倾向<select id="gender"><option value="neutral">中性均可</option><option value="boy">男孩</option><option value="girl">女孩</option></select></label>
+<label>出生日期<input id="birth-date" type="date" value="2026-07-14"></label>
+<label>出生时间<input id="birth-time" type="time" value="19:20"></label>
+<label>出生地时区<select id="timezone"><option value="+08:00">中国 UTC+8</option><option value="+09:00" selected>印尼东部 UTC+9</option><option value="+07:00">印尼西部 UTC+7</option></select></label>
+<label class="check"><input id="traditional-reference" type="checkbox" checked>启用季节与时辰参考</label>
+<label>审美方向<select id="style"><option selected>耐看自然</option><option>温润清雅</option><option>书卷文化</option><option>清朗明亮</option><option>大气稳重</option><option>现代轻盈</option><option>自然舒展</option><option>古典雅致</option></select></label>
+<label>核心寓意<select id="meaning"><option>智慧</option><option selected>品格</option><option>志向</option><option>平安</option><option>光明</option><option>成长</option><option>从容</option><option>责任</option></select></label>
+<label>指定字<input id="required-char" maxlength="1" placeholder="可选"></label>
+<label>避开字<input id="avoid-chars" placeholder="如：梓轩"></label>
+<label>家庭避讳词<input id="custom-taboos" placeholder="用逗号分隔"></label>
+<label class="check"><input id="avoid-trend" type="checkbox" checked>降低近年高频网红名权重</label>
+</div>
+<button id="generate">重新生成</button><button id="refresh" class="secondary">换一组</button>
+<div class="privacy">每次只展示6个达到门槛的候选；点击“不喜欢”后，本次会立即排除该名字。信息只在浏览器内计算。</div>
+</section>
+<section id="birth-summary" class="summary"></section>
+<section id="recommendations" class="cards"></section>
+</main>
+</div>
+<script>__INLINE_ENGINE__</script>
+<script>__INLINE_UI__</script>
+</body>
+</html>
