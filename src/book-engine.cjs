@@ -46,11 +46,6 @@ function birthTags(input){return Base.profile(input);}
 function maternalTags(input){return input.maternalMode==='symbolic'?(Base.MATERNAL[input.motherSurname]||[]):[];}
 function intersects(a=[],b=[]){return a.filter(item=>b.includes(item));}
 function uniq(items){return[...new Set(items.filter(Boolean))];}
-function charPinyin(ch){
-  if(Base.PINYIN[ch])return Base.PINYIN[ch];
-  if(Base.SURNAME[ch])return Base.SURNAME[ch];
-  return[ch,0];
-}
 function sourceType(record){return record.source?'direct':'modern';}
 
 function methodsFor(record,input){
@@ -123,7 +118,7 @@ function routeReason(record,input,method,bHits,mHits){
   const wish=input.familyWish?.trim();
   if(method==='xin'){
     const facts=uniq([...bHits,...birthTags(input)]).slice(0,3);
-    return`以出生事实为纪念，参考${facts.join('、')||'出生时节'}形成名字意象；它只记录成长起点，不作命运判断。`;
+    return`以出生事实为纪念，参考${facts.join('、')||'出生时节'}形成名字意象；仅作纪念性说明，不推断吉凶。`;
   }
   if(method==='yi')return`以德行与人生期待立意，重点表达${record.meanings?.join('、')||input.meaning}${wish?`，并回应家庭期待“${wish}”`:''}。`;
   if(method==='xiang')return`以人格气质立意，名字希望呈现${record.styles?.join('、')||input.style}的整体形象，而不是堆叠吉祥字。`;
