@@ -15,7 +15,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm run check
+      - name: Build standalone page
+        run: npm run build
+      - name: Test audited name corpus
+        run: node --test tests/name-engine.test.cjs
+      - name: Test five naming methods
+        run: node --test tests/book-engine.test.cjs
+      - name: Test interface controls
+        run: node --test tests/ui-smoke.test.js
+      - name: Test standalone output
+        run: node --test tests/build.test.js
       - name: Commit generated standalone page
         if: github.event_name == 'push' && github.ref_name == 'feature/book-grounded-naming-v6'
         run: |
