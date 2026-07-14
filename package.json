@@ -1,1 +1,10 @@
-{"name":"haoming-youjie","private":true,"type":"module","scripts":{"test":"node --test"}}
+{
+  "name": "haoming-dynamic-engine",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "node scripts/build-single-html.mjs",
+    "check": "npm test && npm run build && npm test"
+  }
+}
