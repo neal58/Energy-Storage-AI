@@ -11,4 +11,7 @@ test('root page is fully standalone and contains dynamic controls',async()=>{
   assert.ok(html.includes('id="generate"'));
   assert.ok(!/<script[^>]+src=/.test(html));
   assert.ok(!/type=["']module["']/.test(html));
+  const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match=>match[1]);
+  assert.ok(scripts.length>0);
+  for(const source of scripts)assert.doesNotThrow(()=>new Function(source));
 });
