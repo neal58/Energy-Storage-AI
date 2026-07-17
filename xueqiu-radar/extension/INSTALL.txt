@@ -1,0 +1,3 @@
+Edge: edge://extensions
+Chrome: chrome://extensions
+开启开发人员模式，选择“加载解压缩的扩展”，然后选择 extension 文件夹。
