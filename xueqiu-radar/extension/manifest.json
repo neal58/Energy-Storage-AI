@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "雪球大V雷达",
+  "version": "0.1.0",
+  "description": "扫描当前已登录的雪球页面，将真实大V和动态同步到个人雷达。",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://xueqiu.com/*",
+    "https://*.xueqiu.com/*",
+    "https://hbioiasauagkjcqmwqlw.supabase.co/*"
+  ],
+  "action": {
+    "default_title": "雪球大V雷达",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [{
+    "matches": ["https://xueqiu.com/*", "https://*.xueqiu.com/*"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }]
+}
