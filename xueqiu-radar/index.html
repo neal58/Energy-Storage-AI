@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>雪球大V雷达</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f4f6fb;color:#172033;font-family:Arial,"Microsoft YaHei",sans-serif}.wrap{max-width:1180px;margin:auto;padding:22px}.hero{background:linear-gradient(135deg,#173250,#2f66a0);color:#fff;border-radius:18px;padding:26px;box-shadow:0 16px 35px #17325025}.hero h1{margin:0 0 8px;font-size:30px}.hero p{margin:0;opacity:.9}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat,.panel,.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 24px #3341550d}.stat{padding:16px}.stat b{display:block;font-size:28px;color:#20588b}.panel{padding:16px;margin-bottom:14px}.toolbar,.row,.actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row{justify-content:space-between}.toolbar input,.toolbar select,.form input,.form textarea{border:1px solid #ccd5e1;border-radius:9px;padding:10px;font:inherit;background:#fff}.toolbar input{min-width:250px}.btn{border:0;border-radius:9px;padding:10px 13px;background:#e8eef5;color:#244867;font-weight:700;cursor:pointer;text-decoration:none}.btn.primary{background:#2764a5;color:#fff}.btn.danger{background:#feecec;color:#9d2f2f}.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.card{padding:18px}.card h3{margin:0 0 5px}.score{font-size:28px;color:#2764a5}.tag{display:inline-block;border-radius:99px;background:#edf3fa;color:#31577f;padding:4px 9px;font-size:12px;margin:8px 5px 5px 0}.tag.gold{background:#fff0d3;color:#8b5a00}.card p{line-height:1.6;min-height:48px}.actions{border-top:1px solid #edf0f4;margin-top:12px;padding-top:12px}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form label{display:flex;flex-direction:column;gap:6px;font-size:13px}.form .full{grid-column:1/-1}.notice{padding:12px;border-radius:10px;margin-bottom:12px}.ok{background:#eaf7ef;color:#17643a}.err{background:#fff0f0;color:#a12626}.empty{padding:45px;text-align:center;background:#fff;border-radius:14px}.muted{color:#708090}.loading{padding:40px;text-align:center}.hidden{display:none}@media(max-width:760px){.stats,.grid{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.form .full{grid-column:auto}}@media(max-width:520px){.wrap{padding:12px}.stats,.grid{grid-template-columns:1fr}.toolbar input{min-width:100%;width:100%}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>雪球大V雷达</h1>
+    <p>个人自用｜粉丝≥1万进入候选池，≥5万标记头部大V｜机器初评 + 人工筛选</p>
+  </section>
+  <section class="stats">
+    <div class="stat"><b id="allCount">0</b>候选大V</div>
+    <div class="stat"><b id="headCount">0</b>头部大V</div>
+    <div class="stat"><b id="coreCount">0</b>核心关注</div>
+    <div class="stat"><b id="pendingCount">0</b>待筛选</div>
+  </section>
+  <div id="notice" class="notice hidden"></div>
+  <section class="panel">
+    <div class="toolbar">
+      <input id="search" placeholder="搜索昵称、行业、股票">
+      <select id="statusFilter">
+        <option value="all">全部状态</option>
+        <option value="unreviewed">待筛选</option>
+        <option value="core">核心关注</option>
+        <option value="watch">观察名单</option>
+        <option value="ignored">已忽略</option>
+        <option value="blocked">已屏蔽</option>
+      </select>
+      <button class="btn primary" id="refreshBtn">刷新</button>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>添加雪球大V</h2>
+    <form id="createForm" class="form">
+      <label>雪球用户ID<input required name="xueqiu_user_id" placeholder="主页URL中的数字ID"></label>
+      <label>昵称<input required name="nickname"></label>
+      <label class="full">主页地址<input required name="profile_url" placeholder="https://xueqiu.com/u/..."></label>
+      <label>粉丝数<input required type="number" name="followers_count" min="10000" value="10000"></label>
+      <label>研究方向<input name="primary_topics" placeholder="如：AI算力,光模块"></label>
+      <label class="full">代表内容<textarea name="representative_content" rows="3"></textarea></label>
+      <div class="full"><button class="btn primary" type="submit">保存并加入候选池</button></div>
+    </form>
+  </section>
+  <div id="loading" class="loading">正在读取 Supabase 数据……</div>
+  <main id="grid" class="grid"></main>
+</div>
+<script>
+const API='https://hbioiasauagkjcqmwqlw.supabase.co/functions/v1/xueqiu-radar-api';
+const names={unreviewed:'待筛选',core:'核心关注',watch:'观察名单',ignored:'已忽略',blocked:'已屏蔽'};
+let rows=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function notify(text,type='ok'){const n=document.getElementById('notice');n.textContent=text;n.className='notice '+type;n.classList.remove('hidden');setTimeout(()=>n.classList.add('hidden'),3500)}
+async function request(method='GET',body){const r=await fetch(API,{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json();if(!r.ok||j.error)throw new Error(j.error||'请求失败');return j}
+async function load(){document.getElementById('loading').classList.remove('hidden');try{const j=await request();rows=j.data||[];render()}catch(e){notify(e.message,'err')}finally{document.getElementById('loading').classList.add('hidden')}}
+function render(){const q=document.getElementById('search').value.trim().toLowerCase();const status=document.getElementById('statusFilter').value;document.getElementById('allCount').textContent=rows.length;document.getElementById('headCount').textContent=rows.filter(x=>x.is_head).length;document.getElementById('coreCount').textContent=rows.filter(x=>x.manual_status==='core').length;document.getElementById('pendingCount').textContent=rows.filter(x=>x.manual_status==='unreviewed').length;const filtered=rows.filter(x=>(status==='all'||x.manual_status===status)&&(!q||[x.nickname,...(x.primary_topics||[]),x.representative_content||''].join(' ').toLowerCase().includes(q)));const grid=document.getElementById('grid');if(!filtered.length){grid.innerHTML='<div class="empty">暂无符合条件的大V。</div>';return}grid.innerHTML=filtered.map(x=>`<article class="card"><div class="row"><div><h3>${esc(x.nickname)}</h3><small class="muted">粉丝 ${Number(x.followers_count).toLocaleString()} · ${names[x.manual_status]||x.manual_status}</small></div><b class="score">${Number(x.total_score||0).toFixed(1)}</b></div><div>${x.is_head?'<span class="tag gold">头部大V</span>':''}${(x.primary_topics||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><p>${esc(x.representative_content||'尚未录入代表内容，建议打开雪球主页人工复核。')}</p><small class="muted">聚焦 ${Number(x.focus_score||0).toFixed(1)}/20　原创 ${Number(x.originality_score||0).toFixed(1)}/20　可验证 ${Number(x.verifiability_score||0).toFixed(1)}/20</small><div class="actions"><a class="btn" href="${esc(x.profile_url)}" target="_blank">打开雪球</a>${['core','watch','ignored','blocked'].map(s=>`<button class="btn ${s==='blocked'?'danger':''}" onclick="setStatus(${x.id},'${s}')">${names[s]}</button>`).join('')}</div></article>`).join('')}
+async function setStatus(id,status){try{await request('POST',{action:'status',id,status});notify('筛选状态已更新');await load()}catch(e){notify(e.message,'err')}}
+document.getElementById('createForm').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target);const body={action:'create',xueqiu_user_id:f.get('xueqiu_user_id'),nickname:f.get('nickname'),profile_url:f.get('profile_url'),followers_count:Number(f.get('followers_count')),primary_topics:String(f.get('primary_topics')||'').split(/[,，]/).map(x=>x.trim()).filter(Boolean),representative_content:f.get('representative_content')};try{await request('POST',body);notify('已加入候选池');e.target.reset();e.target.followers_count.value=10000;await load()}catch(err){notify(err.message,'err')}});
+document.getElementById('search').addEventListener('input',render);document.getElementById('statusFilter').addEventListener('change',render);document.getElementById('refreshBtn').addEventListener('click',load);load();
+</script>
+</body>
+</html>
